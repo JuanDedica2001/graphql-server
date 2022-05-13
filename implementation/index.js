@@ -1,17 +1,19 @@
 const { ApolloServer, gql } = require('apollo-server');
 const { allCharacters, findCharacter, filterCharacters } = require('./resolvers')
 
-const typeDefs = gql`  
+const typeDefs = gql`
+  "Todos los status de vida dentro de la api"
   enum Status {
-    alive
-    dead
-    unknown
+    ALIVE
+    DEAD
+    UNKNOWN
   }
+  "Es por conveción poner los valores de los enum asi por que se podrían interpresar como constantes"
   enum Gender {
-    female
-    male
-    genderless
-    unknown
+    FEMALE
+    MALE
+    GENDERLESS
+    UNKNOWN
   }
   type Origin {
     name: String
@@ -31,9 +33,18 @@ const typeDefs = gql`
     url: String!
     created: String!
   }
+  
+  input FilterCharacters {
+    name: String
+    status: Status
+    species: String
+    type: String
+    gender: Gender
+  }
+  
   type Query {
     allCharacters(page: Int): [Character]
-    filterCharacters(name: String!, status: Status, species: String, type: String, gender: Gender ): [Character]
+    filterCharacters(filter: FilterCharacters): [Character]
     findCharacter(id: Int!): Character
   }
 `

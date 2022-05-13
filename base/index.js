@@ -16,20 +16,41 @@ const typeDefs = gql`
     APA: String
     age: Int
     editorial: String
+    genre: String
   }
-  type Note {
-    title: String
-    content: String
+  
+  interface Note {
+    title: String!
+    content: String!
+    author: String
   }
+  
+  type BookNote implements Note{
+    title: String!
+    content: String!
+    author: String
+    numberPage: Int!
+  }
+  
+  type ReviewNote implements Note {
+    title: String!
+    content: String!
+    author: String
+    age: Int
+  }
+  
   input Review {
     title: String!
     content: String!
     author: String
+    numberPage: Int
+    age: Int
   }
   type Mutation {
     addBook(title: String!, author: String, numberOfPages: Int): Book
     modifyTitle(id: ID!, title: String!): Book
     generateReview(content: Review!): Note
+    generateComment(content: Review!): BookNote
   }
 `
 
@@ -44,6 +65,17 @@ const resolvers = {
   Book: {
     APA: (root) => {
       return `${root.author[0]}.${root.author.slice(root.author.indexOf(' '), root.author.length)} (${root.age || 's.f'}). ${root.title}${root.editorial ? '. ' + root.editorial : ''}${root.numberOfPages ? '. ' + root.numberOfPages.toString() + 'p' : ''}`;	
+    }
+  },
+  Note: {
+    __resolveType(Note) {
+      if (Note.numberPage) {
+        return 1;
+      }
+      if (Note.age) {
+        return 2000;
+      }
+      return null
     }
   },
   Mutation: {
@@ -71,11 +103,18 @@ const resolvers = {
       return modifiedBook
     },
     generateReview: (root, args) => {
+      console.log(args)
       return {
         title: args.content.title,
         content: args.content.content
       }
     },
+    generateComment: (root, args) => {
+      console.log(args)
+      return {
+        ...args.content
+      }
+    }
   }
 }
 

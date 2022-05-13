@@ -8,7 +8,8 @@ const books = [
     age: 1998,
     author: 'J.K. Rowling',
     editorial: 'Blodhaven',
-    numberOfPages: 341
+    numberOfPages: 341,
+    genre: 'Fantasy'
   }, 
   {
     id: v1(),
@@ -16,19 +17,22 @@ const books = [
     age: 1993,
     editorial: 'Blodhaven',
     author: 'Michael Crichton', 
-    numberOfPages: 456
+    numberOfPages: 456,
+    genre: 'Adventure'
   },
   {
     id: v1(),
     title: 'The Awakening',
     age: 2000,
     author: 'Kate Chopin',
+    genre: 'Terror'
   },
   {
     id: v1(),
     title: 'City of Glass',
     age: 1993,
     author: 'Paul Auster',
+    genre: 'Adventure'
   },
   {
     id: v1(),

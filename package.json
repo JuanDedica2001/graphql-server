@@ -7,7 +7,7 @@
     "start:base": "node base/index.js",
     "start:inp": "node implementation/index.js",
     "dev:base": "nodemon base/index.js",
-    "dev:inp": "nodemos base/index.js"
+    "dev:inp": "nodemon implementation/index.js"
   },
   "keywords": [],
   "author": "Juan José <cursosdetuvida100@gmail.com>",

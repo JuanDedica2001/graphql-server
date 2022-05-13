@@ -2,7 +2,7 @@ const { default: axios } = require("axios");
 const generateUrl = require("../helpers/generateUrl");
 
 async function filterCharacters(root, args) {
-  const url = generateUrl(args);
+  const url = generateUrl(args.filter);
   const response = await axios.get(url);
   return response.data.results;
 }
@@ -21,8 +21,6 @@ async function findCharacter(root, args) {
   const response = await axios.get(url);
   return response.data;
 }
-
-
 
 module.exports = {
   filterCharacters,
