@@ -1,5 +1,5 @@
 const { ApolloServer, gql, UserInputError } = require('apollo-server');
-const { books } = require('./db.js');
+const { books, notes } = require('./db.js');
 const { v1 } = require('uuid');
 
 const typeDefs = gql`
@@ -7,6 +7,7 @@ const typeDefs = gql`
     allBooks: [Book]
     numberOfBooks: Int
     findBooks(title: String!): [Book]
+    allNotes: [Note]
   }
   type Book {
     id: ID
@@ -60,35 +61,33 @@ const resolvers = {
     numberOfBooks: () => books.length,
     findBooks: (root, args) => {
       return books.filter(book => book.title.toLowerCase().includes(args.title.toLowerCase()));
-    }
+    },
+    allNotes: () => notes
   },
   Book: {
     APA: (root) => {
-      return `${root.author[0]}.${root.author.slice(root.author.indexOf(' '), root.author.length)} (${root.age || 's.f'}). ${root.title}${root.editorial ? '. ' + root.editorial : ''}${root.numberOfPages ? '. ' + root.numberOfPages.toString() + 'p' : ''}`;	
+      return `${root.author[0]}.${root.author.slice(root.author.indexOf(' '), root.author.length)} (${root.age || 's.f'}). ${root.title}${root.editorial ? '. ' + root.editorial : ''}${root.numberOfPages ? '. ' + root.numberOfPages.toString() + 'p' : ''}`;
     }
   },
   Note: {
     __resolveType(Note) {
-      if (Note.numberPage) {
-        return 1;
-      }
       if (Note.age) {
-        return 2000;
+        return 'ReviewNote'
       }
-      return null
+      if (Note.numberPage) {
+        return 'BookNote'
+      }
+      return null;
     }
   },
   Mutation: {
     addBook: (root, args) => {
-      const {title, author, numberOfPages} = args;
-      const book = {
+      const newBook = {
         id: v1(),
-        title,
-        author,
-        numberOfPages
+        ...args
       }
-      books.push(book);
-      return book;
+      books.push(newBook);
+      return newBook;
     },
     modifyTitle: (root, args) => {
       const book = books.find(book => book.id === args.id);
@@ -100,20 +99,25 @@ const resolvers = {
         title: args.title
       }
       books.map(book => book.id === args.id ? modifiedBook : book);
-      return modifiedBook
+      return modifiedBook;
     },
     generateReview: (root, args) => {
-      console.log(args)
-      return {
+      const newNote = {
         title: args.content.title,
-        content: args.content.content
+        content: args.content.content,
+        age: args.content.age
       }
+      notes.push(newNote);
+      return newNote
     },
     generateComment: (root, args) => {
-      console.log(args)
-      return {
-        ...args.content
+      const newNote = {
+        title: args.content.title,
+        content: args.content.content,
+        numberPage: args.content.numberPage
       }
+      notes.push(newNote);
+      return newNote;
     }
   }
 }

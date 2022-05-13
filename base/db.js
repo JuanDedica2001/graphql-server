@@ -81,6 +81,9 @@ const books = [
   },
 ]
 
+const notes = []
+
 module.exports = {
-  books
+  books,
+  notes
 };
