@@ -3,12 +3,6 @@ const { books, notes } = require('./db.js');
 const { v1 } = require('uuid');
 
 const typeDefs = gql`
-  type Query {
-    allBooks: [Book]
-    numberOfBooks: Int
-    findBooks(title: String!): [Book]
-    allNotes: [Note]
-  }
   type Book {
     id: ID
     title: String!
@@ -19,6 +13,8 @@ const typeDefs = gql`
     editorial: String
     genre: String
   }
+  
+  union BooksThings = Book | BookNote
   
   interface Note {
     title: String!
@@ -47,6 +43,13 @@ const typeDefs = gql`
     numberPage: Int
     age: Int
   }
+  type Query {
+    allBooks: [Book]
+    numberOfBooks: Int
+    findBooks(title: String!): [Book]
+    allNotes: [Note]
+    searchBookThings(contains: String): [BooksThings]
+  }
   type Mutation {
     addBook(title: String!, author: String, numberOfPages: Int): Book
     modifyTitle(id: ID!, title: String!): Book
@@ -62,11 +65,27 @@ const resolvers = {
     findBooks: (root, args) => {
       return books.filter(book => book.title.toLowerCase().includes(args.title.toLowerCase()));
     },
-    allNotes: () => notes
+    allNotes: () => notes,
+    searchBookThings: (root, args) => {
+      const filteredNotes = notes.filter(item => item.title.toLowerCase().includes(args.contains.toLowerCase()));
+      const filteredBooks = books.filter(book => book.title.toLowerCase().includes(args.contains.toLowerCase()));
+      return [...filteredBooks, ...filteredNotes]
+    }
   },
   Book: {
     APA: (root) => {
       return `${root.author[0]}.${root.author.slice(root.author.indexOf(' '), root.author.length)} (${root.age || 's.f'}). ${root.title}${root.editorial ? '. ' + root.editorial : ''}${root.numberOfPages ? '. ' + root.numberOfPages.toString() + 'p' : ''}`;
+    }
+  },
+  BooksThings: {
+    __resolveType(obj) {
+      if (obj.age){
+        return 'Book';
+      }
+      if(obj.numberPage) {
+        return 'BookNote';
+      }
+      return null;
     }
   },
   Note: {
@@ -124,7 +143,7 @@ const resolvers = {
 
 const server = new ApolloServer({
   typeDefs,
-  resolvers
+  resolvers,
 })
 
 server.listen()
