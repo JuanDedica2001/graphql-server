@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:base": "node base/index.js",
+    "start:inp": "node implementation/index.js",
+    "dev:base": "nodemon base/index.js",
+    "dev:inp": "nodemos base/index.js"
   },
   "keywords": [],
   "author": "Juan José <cursosdetuvida100@gmail.com>",

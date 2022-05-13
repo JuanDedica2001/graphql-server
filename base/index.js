@@ -3,6 +3,11 @@ const { books } = require('./db.js');
 const { v1 } = require('uuid');
 
 const typeDefs = gql`
+  type Query {
+    allBooks: [Book]
+    numberOfBooks: Int
+    findBooks(title: String!): [Book]
+  }
   type Book {
     id: ID
     title: String!
@@ -10,16 +15,21 @@ const typeDefs = gql`
     numberOfPages: Int
     APA: String
     age: Int
-    editiorial: String
+    editorial: String
   }
-  type Query {
-    allBooks: [Book]
-    numberOfBooks: Int
-    findBooks(title: String!): [Book]
+  type Note {
+    title: String
+    content: String
+  }
+  input Review {
+    title: String!
+    content: String!
+    author: String
   }
   type Mutation {
     addBook(title: String!, author: String, numberOfPages: Int): Book
     modifyTitle(id: ID!, title: String!): Book
+    generateReview(content: Review!): Note
   }
 `
 
@@ -59,7 +69,13 @@ const resolvers = {
       }
       books.map(book => book.id === args.id ? modifiedBook : book);
       return modifiedBook
-    }
+    },
+    generateReview: (root, args) => {
+      return {
+        title: args.content.title,
+        content: args.content.content
+      }
+    },
   }
 }
 
